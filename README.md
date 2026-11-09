@@ -1,0 +1,2 @@
+> ⚠️ **Important Note Regarding Background Video Playback:**
+> If you are viewing this project directly via static deployment (such as GitHub Pages) or local file paths (`file://`), the background video assets may not play automatically or render properly. This is due to strict browser security policies (CORS and autoplay restrictions) regarding local directory references. Once the project is connected to a proper live domain or web server, the background videos will stream and display seamlessly.
