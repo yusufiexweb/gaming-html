@@ -1,0 +1,831 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08090c">
+<title>NOVA333x | Gaming Worlds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+:root{--bg:#08090c;--fg:#f4f4f5;--muted:#b7b8c1;--gold:#c7a66a;--line:#ffffff2b;--nav:76px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:var(--nav)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,sans-serif;overflow-x:hidden}
+body.modal-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+
+/* 3D PRELOADER */
+.preloader{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;background:#07080b;transition:opacity .6s,visibility .6s;overflow:hidden}
+.preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+.preloader:before,.preloader:after{content:"";position:absolute;width:48vw;height:48vw;border:1px solid #c7a66a28;border-radius:50%;animation:orbit 10s linear infinite}
+.preloader:after{width:34vw;height:34vw;border-color:#ffffff18;animation-direction:reverse}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(#ffffff09 1px,transparent 1px),linear-gradient(90deg,#ffffff09 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse,#000,transparent 70%)}
+.loader{position:relative;display:grid;justify-items:center;gap:17px;text-align:center}
+.cube-scene{width:100px;height:100px;display:grid;place-items:center;perspective:500px}
+.cube{width:58px;height:58px;position:relative;transform-style:preserve-3d;animation:spin 4s linear infinite}
+.face{position:absolute;inset:0;border:1px solid var(--gold);background:#c7a66a12;box-shadow:inset 0 0 22px #c7a66a20}
+.face:nth-child(1){transform:translateZ(29px)}
+.face:nth-child(2){transform:rotateY(180deg) translateZ(29px)}
+.face:nth-child(3){transform:rotateY(90deg) translateZ(29px)}
+.face:nth-child(4){transform:rotateY(-90deg) translateZ(29px)}
+.face:nth-child(5){transform:rotateX(90deg) translateZ(29px)}
+.face:nth-child(6){transform:rotateX(-90deg) translateZ(29px)}
+.loader-brand{font:800 32px "Barlow Condensed";letter-spacing:3px}
+.loader-brand span{color:var(--gold)}
+.loader-caption{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+.track{height:2px;width:190px;background:#282930}
+.progress{height:100%;background:var(--gold);animation:progress 1.8s ease forwards}
+@keyframes spin{to{transform:rotateX(335deg) rotateY(360deg)}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes progress{to{width:100%}}
+
+/* NAVBAR */
+.navbar{height:var(--nav);position:fixed;z-index:100;inset:0 0 auto;padding:0 6%;display:flex;align-items:center;justify-content:space-between;gap:20px;background:#08090cd9;backdrop-filter:blur(18px);border-bottom:1px solid #ffffff17}
+.brand{font:800 30px "Barlow Condensed";letter-spacing:1.5px;white-space:nowrap}
+.brand span{color:var(--gold)}
+.nav-links,.nav-actions{display:flex;align-items:center;gap:20px}
+.nav-links{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.nav-link{padding:10px 0;color:#e2e2e7;background:none;border:0;font-size:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
+.nav-link:hover{color:var(--gold)}
+.dropdown{position:relative}
+.dropdown-toggle{display:flex;align-items:center;gap:7px}
+.dropdown-menu{position:absolute;top:calc(100% + 14px);left:-12px;width:210px;padding:8px;display:none;gap:3px;background:#111319;border:1px solid var(--line);border-radius:8px}
+.dropdown.open .dropdown-menu{display:grid}
+.dropdown-menu a{padding:11px;color:var(--muted);font-size:10px;border-radius:5px}
+.dropdown-menu a:hover{background:#ffffff10;color:white}
+.btn{min-height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.35px;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-light{background:#f5f5f5;color:#101114;border-color:#f5f5f5}
+.btn-light:hover{background:var(--gold);border-color:var(--gold)}
+.btn-outline{background:transparent;color:white}
+.btn-outline:hover,.btn-demo:hover,.btn-official:hover{border-color:var(--gold);color:var(--gold)}
+.menu-toggle{display:none;background:none;border:0;color:white;font-size:22px}
+
+/* CINEMATIC BACKGROUNDS */
+.cinema{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#08090c}
+.video-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .65s}
+.video-layer.active{opacity:1}
+.cinema:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#050609d1,#05060975 50%,#050609b8),linear-gradient(0deg,#08090c,transparent 38%)}
+.ambient{position:absolute;inset:0;opacity:.15;background:radial-gradient(ellipse at 76% 40%,var(--ambient,#907448),transparent 55%);mix-blend-mode:screen}
+main,footer{position:relative;z-index:1}
+
+/* HERO */
+.hero{min-height:100svh;padding:calc(var(--nav) + 100px) 10% 110px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;position:relative}
+.eyebrow{display:flex;align-items:center;gap:12px;color:var(--gold);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.eyebrow:before{content:"";width:30px;height:1px;background:var(--gold)}
+.hero h1{margin:24px 0;font:800 clamp(68px,11vw,145px)/.83 "Barlow Condensed";letter-spacing:-2px}
+.hero h1 span{color:transparent;-webkit-text-stroke:1px #ffffffcc}
+.hero-description{max-width:460px;color:#d0d0d6;font-size:13px;line-height:1.9}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:17px}
+.scroll-hint{position:absolute;bottom:35px;left:10%;display:flex;align-items:center;gap:12px;color:#c4c4cb;font-size:9px;letter-spacing:2px;text-transform:uppercase}
+.scroll-line{width:42px;height:1px;background:var(--gold)}
+
+/* GAME SECTIONS */
+.game-indicator{position:fixed;z-index:20;top:50%;left:27px;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px}
+.game-indicator a{width:3px;height:21px;background:#ffffff4d}
+.game-indicator a.active{height:37px;background:var(--gold)}
+.game-section{min-height:100svh;padding:calc(var(--nav) + 60px) 9% 75px 10%;display:flex;align-items:center;justify-content:flex-end;scroll-margin-top:var(--nav)}
+.game-content{width:min(100%,570px);margin-left:auto;padding:26px 0 26px 30px;border-left:1px solid #ffffff66;opacity:0;visibility:hidden;transform:translateX(22px);transition:.25s}
+.game-section.visible .game-content{opacity:1;visibility:visible;transform:none}
+.game-number{color:var(--gold);font-size:10px;font-weight:700;letter-spacing:3px}
+.game-title{margin:15px 0;font:800 clamp(49px,6.5vw,82px)/.91 "Barlow Condensed";text-transform:uppercase;overflow-wrap:anywhere}
+.game-meta{margin-bottom:18px;color:#dfdfe3;font-size:9px;letter-spacing:1.35px;line-height:2;text-transform:uppercase}
+.game-description{max-width:500px;color:#d1d1d8;font-size:12px;line-height:1.9}
+.feature-list,.game-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.feature-list{margin:18px 0 24px}
+.feature{padding:8px 10px;background:#00000026;border:1px solid #ffffff2e;font-size:8px;letter-spacing:.6px;text-transform:uppercase}
+.btn-play{background:var(--gold);border-color:var(--gold);color:#101114}
+.btn-demo{background:#0c0d1188;border-color:#ffffffa6}
+.btn-official{background:transparent}
+
+/* MODALS */
+.modal{position:fixed;inset:0;z-index:1000;padding:20px;display:none;justify-content:center;align-items:center;background:#000000dc;backdrop-filter:blur(12px);overflow-y:auto}
+.modal.open{display:flex}
+.modal-panel{width:min(100%,570px);max-height:92vh;overflow:auto;padding:26px;background:#101116;border:1px solid #ffffff26;border-radius:12px}
+.modal-panel.wide{width:min(100%,950px)}
+.modal-header{display:flex;justify-content:space-between;gap:15px;margin-bottom:22px}
+.modal-title{margin:0;font:700 34px/1.05 "Barlow Condensed";text-transform:uppercase}
+.modal-subtitle,.form-note{color:var(--muted);font-size:11px;line-height:1.7}
+.modal-close{width:38px;height:38px;flex:0 0 38px;color:white;background:none;border:1px solid var(--line);border-radius:50%;transition:background .2s ease,border-color .2s ease,color .2s ease}
+.modal-close:hover{color:#111;background:#ffeb3b;border-color:#ffeb3b}
+.form{display:grid;gap:15px}
+.field{display:grid;gap:8px}
+.field label{font-size:10px;font-weight:600;color:#dedee4}
+.field input,.field textarea{width:100%;padding:13px 14px;color:white;background:#090a0e;border:1px solid #ffffff26;border-radius:7px;font-size:12px}
+.field textarea{min-height:120px;resize:vertical}
+.password-wrap{position:relative}
+.password-wrap input{padding-right:45px}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted)}
+.check-row{display:flex;gap:9px;color:var(--muted);font-size:10px;line-height:1.7}
+.form-status{display:none;padding:12px;border:1px solid #c7a66a66;background:#c7a66a14;border-radius:7px;color:#f1d8a8;font-size:11px;line-height:1.8}
+.form-status.show{display:block}
+.auth-switch{text-align:center;color:var(--muted);font-size:11px}
+.text-button{padding:0;border:0;background:none;color:var(--gold);font-weight:700}
+.modal-video-wrap{position:relative;aspect-ratio:16/9;background:#050505}
+.modal-video{width:100%;height:100%;object-fit:contain}
+.video-message{display:none;position:absolute;inset:0;place-items:center;padding:25px;text-align:center;background:#090a0d;font-size:12px}
+.video-message.show{display:grid}
+.modal-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.modal-video-count{color:var(--muted);font-size:10px}
+.modal-nav{display:flex;gap:8px}
+
+/* FOOTER */
+footer{padding:45px 8%;background:#08090c;border-top:1px solid var(--line)}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:25px}
+.footer-brand p{color:var(--muted);font-size:11px}
+.socials{display:flex;gap:12px}
+.social-link{width:43px;height:43px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%}
+.social-link:hover{color:var(--gold);border-color:var(--gold)}
+.copyright{width:100%;padding-top:22px;border-top:1px solid #ffffff14;color:#85858f;font-size:10px}
+
+@media(max-width:1100px){.navbar{padding:0 4%}.nav-links{gap:13px}}
+@media(max-width:760px){
+:root{--nav:70px}
+.navbar{gap:10px}
+.brand{font-size:26px}
+.menu-toggle{display:block}
+.nav-links{position:absolute;top:var(--nav);left:0;right:0;padding:15px 6% 22px;background:#08090cf7;border-bottom:1px solid var(--line);display:none;flex-direction:column;align-items:stretch;gap:0}
+.nav-links.open{display:flex}
+.nav-links>a,.dropdown-toggle{padding:14px 0}
+.dropdown-menu{position:static;width:100%;margin-bottom:7px}
+.nav-actions .btn-outline{display:none}
+.hero{padding:135px 7% 100px}
+.hero h1{font-size:clamp(60px,15vw,100px)}
+.scroll-hint{left:7%}
+.game-section{padding:115px 7% 80px 10%}
+.game-content{padding-left:18px}
+.game-title{font-size:clamp(45px,11vw,70px)}
+.game-indicator{left:13px}
+.game-indicator a{height:17px}
+.game-indicator a.active{height:29px}
+.game-actions .btn{min-height:39px;padding:0 9px;font-size:8px}
+.modal{padding:12px}
+.modal-panel{padding:18px}
+footer{padding:35px 7%}
+.preloader:before{width:90vw;height:90vw}
+.preloader:after{width:65vw;height:65vw}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+
+<body>
+<div class="preloader" id="preloader" aria-label="Loading NOVA333x">
+  <div class="grid-bg"></div>
+  <div class="loader">
+    <div class="cube-scene" aria-hidden="true">
+      <div class="cube">
+        <i class="face"></i><i class="face"></i><i class="face"></i>
+        <i class="face"></i><i class="face"></i><i class="face"></i>
+      </div>
+    </div>
+    <div class="loader-brand">NOVA<span>333</span>x</div>
+    <div class="loader-caption">Initializing gaming worlds</div>
+    <div class="track"><div class="progress"></div></div>
+  </div>
+</div>
+
+<div class="cinema" aria-hidden="true">
+  <video class="video-layer active" id="videoA" autoplay muted loop playsinline></video>
+  <video class="video-layer" id="videoB" autoplay muted loop playsinline></video>
+  <div class="ambient" id="ambient"></div>
+</div>
+
+<header class="navbar">
+  <a href="#home" class="brand">NOVA<span>333</span>x</a>
+  <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+    <a class="nav-link" href="#home">Home</a>
+    <div class="dropdown">
+      <button class="nav-link dropdown-toggle">Services <i class="fa-solid fa-chevron-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="#games">Gaming Experiences</a>
+        <a href="#game-1">Game Showcase</a>
+        <a href="#contact">Contact &amp; Collaboration</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="nav-link dropdown-toggle">Projects <i class="fa-solid fa-chevron-down"></i></button>
+      <div class="dropdown-menu">
+        <a href="#game-1">Assassin's Creed</a>
+        <a href="#game-2">Ghost of Tsushima</a>
+        <a href="#game-3">Sekiro</a>
+        <a href="#game-4">Elden Ring</a>
+        <a href="#game-5">The Witcher 3</a>
+        <a href="#game-6">Black Myth: Wukong</a>
+      </div>
+    </div>
+    <a class="nav-link" href="#games">Skills</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="btn btn-outline" data-open-auth="login">SIGN IN / SIGN UP</button>
+    <button class="btn btn-light" data-open-contact>CONTACT <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="authTitle">Welcome Back</h2>
+        <p class="modal-subtitle" id="authSubtitle">Sign in to your NOVA333x account.</p>
+      </div>
+      <button class="modal-close" data-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form class="form" id="authForm">
+      <div class="field" id="nameField" hidden>
+        <label for="authName">FULL NAME</label>
+        <input id="authName" name="name" maxlength="100" autocomplete="name" placeholder="Your full name">
+      </div>
+      <div class="field">
+        <label for="authEmail">EMAIL ADDRESS</label>
+        <input id="authEmail" name="email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="authPassword">PASSWORD</label>
+        <div class="password-wrap">
+          <input id="authPassword" name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" required placeholder="At least 8 characters">
+          <button class="password-toggle" type="button" id="togglePassword" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
+        </div>
+      </div>
+      <label class="check-row" id="termsRow" hidden>
+        <input type="checkbox" id="authTerms">
+        <span>I agree to the applicable terms and privacy policy.</span>
+      </label>
+      <button class="btn btn-light" id="authSubmit">SIGN IN</button>
+      <div class="form-status" id="authStatus" role="status"></div>
+      <p class="form-note">Demo interface only. A secure backend or authentication provider is required for real accounts.</p>
+      <div class="auth-switch" id="authSwitch">Don't have an account? <button class="text-button" type="button" data-switch="signup">Sign up</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="contactTitle">Let's Connect</h2>
+        <p class="modal-subtitle">Have a project idea? Send NOVA333x a message.</p>
+      </div>
+      <button class="modal-close" data-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form class="form" id="contactForm">
+      <div class="field"><label for="contactName">YOUR NAME</label><input id="contactName" name="name" maxlength="100" autocomplete="name" required placeholder="Enter your name"></div>
+      <div class="field"><label for="contactEmail">YOUR EMAIL</label><input id="contactEmail" name="email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="contactSubject">SUBJECT</label><input id="contactSubject" name="subject" maxlength="150" required placeholder="Project collaboration"></div>
+      <div class="field"><label for="contactMessage">MESSAGE</label><textarea id="contactMessage" name="message" maxlength="3000" required placeholder="Tell me about your project..."></textarea></div>
+      <button class="btn btn-light">PREPARE MESSAGE</button>
+      <div class="form-status" id="contactStatus"></div>
+      <p class="form-note">Your email app will open with the message prepared.</p>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-panel wide">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="modalTitle">Game Videos</h2>
+        <p class="modal-subtitle" id="modalSubtitle">NOVA333x Gaming Showcase</p>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close videos"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-video-wrap">
+      <video class="modal-video" id="modalVideo" controls playsinline preload="metadata"></video>
+      <div class="video-message" id="videoMessage">Video not found. Check the videoGallery file paths in the games list.</div>
+    </div>
+    <div class="modal-controls">
+      <span class="modal-video-count" id="videoCount"></span>
+      <div class="modal-nav">
+        <button class="btn btn-outline" id="prevVideo">PREVIOUS</button>
+        <button class="btn btn-outline" id="nextVideo">NEXT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="game-indicator" aria-label="Game sections">
+  <a href="#game-1" class="active" aria-label="Assassin's Creed"></a>
+  <a href="#game-2" aria-label="Ghost of Tsushima"></a>
+  <a href="#game-3" aria-label="Sekiro"></a>
+  <a href="#game-4" aria-label="Elden Ring"></a>
+  <a href="#game-5" aria-label="The Witcher 3"></a>
+  <a href="#game-6" aria-label="Black Myth Wukong"></a>
+</nav>
+
+<main id="games">
+  <section class="hero" id="home">
+    <div class="eyebrow">NOVA333x presents</div>
+    <h1>EPIC LEGENDS<br><span>HUB</span></h1>
+    <p class="hero-description">Six legendary gaming worlds. Six unique experiences. Explore cinematic environments, unforgettable adventures, and interactive gaming website concepts crafted by NOVA333x.</p>
+    <div class="hero-actions">
+      <a class="btn btn-light" href="#game-1">EXPLORE WORLDS <i class="fa-solid fa-arrow-down"></i></a>
+      <button class="btn btn-outline" data-open-contact>CONTACT ME</button>
+    </div>
+    <div class="scroll-hint"><span class="scroll-line"></span> Scroll to discover</div>
+  </section>
+  <div id="gameSections"></div>
+</main>
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#home" class="brand">NOVA<span>333</span>x</a>
+      <p>Digital creativity. Immersive experiences.</p>
+      <button class="btn btn-outline" style="margin-top:15px" data-open-contact>CONTACT / COLLABORATE</button>
+    </div>
+    <div class="socials">
+      <a class="social-link" href="YOUR_UPWORK_PROFILE_URL" target="_blank" rel="noopener noreferrer" aria-label="Upwork"><i class="fa-brands fa-upwork"></i></a>
+      <a class="social-link" href="YOUR_LINKEDIN_PROFILE_URL" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      <a class="social-link" href="YOUR_GITHUB_PROFILE_URL" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <div class="copyright">© 2026 NOVA333x. Game names and trademarks belong to their respective owners.</div>
+  </div>
+</footer>
+
+<script>
+const CONTACT_EMAIL="user@example.com";
+
+const games=[
+{
+title:"Assassin's Creed",
+displayTitle:"Assassin's<br>Creed",
+year:"2007–Present",
+studio:"Ubisoft",
+genre:"Action Adventure",
+number:"01 / 06",
+color:"#a68a62",
+description:"Enter a world of ancient civilizations, hidden societies, and historical mysteries. Discover breathtaking cities, master stealth and parkour, and explore a universe shaped by legends.",
+features:["Stealth","Parkour","Open World","History"],
+backgroundVideo:"Assasin Creed Short background.mp4",
+videoGallery:["Assassin s Creed Shadows_ Official World Premiere Trailer.mp4","Assassin's Creed Shadows_ Story Trailer.mp4"],
+demoUrl:"Assasin Creed Demo.html",
+officialUrl:"https://www.ubisoft.com/en-us/game/assassins-creed"
+},
+{
+title:"Ghost of Tsushima",
+displayTitle:"Ghost of<br>Tsushima",
+year:"2020",
+studio:"Sucker Punch",
+genre:"Action Adventure",
+number:"02 / 06",
+color:"#ad513b",
+description:"Journey through a breathtaking island of golden forests, ancient temples, and samurai traditions. Explore a cinematic world of honor, sacrifice, and survival.",
+features:["Samurai","Combat","Exploration","Cinematic"],
+backgroundVideo:"Ghost of Tsushima background short.mp4",
+videoGallery:["Ghost of Tsushima wakanda trailer.mp4","Ghost of Tsushima - Official Trailer  The Game Awards.mp4"],
+demoUrl:"Ghost of Tsushima.html",
+officialUrl:"https://www.playstation.com/en-us/games/ghost-of-tsushima/"
+},
+{
+title:"Sekiro: Shadows Die Twice",
+displayTitle:"Sekiro:<br>Shadows Die Twice",
+year:"2019",
+studio:"FromSoftware",
+genre:"Action Adventure",
+number:"03 / 06",
+color:"#a33a3a",
+description:"Master precise sword combat in a vision of Sengoku-era Japan. Every encounter challenges your timing, patience, and mastery in a world filled with danger.",
+features:["Sword Combat","Stealth","Precision","Challenge"],
+backgroundVideo:"Sekiro Shadows Die Twice - Accolades Trailer  PS4.mp4",
+videoGallery:["Sekiro Shadows Die Twice - Accolades Trailer  PS4.mp4","Sekiro Shadows Die Twice - Story Preview Trailer  PS4.mp4"],
+demoUrl:"Sekiro Shadows Die Twice.html",
+officialUrl:"https://www.sekirothegame.com/"
+},
+{
+
+title:"Elden Ring",
+displayTitle:"Elden<br>Ring",
+year:"2022",
+studio:"FromSoftware",
+genre:"Action RPG",
+number:"04 / 06",
+color:"#b29a57",
+description:"Venture into the Lands Between, where monumental ruins, mysterious powers, and forgotten legends await. Forge your own path through an immense dark-fantasy world.",
+features:["Dark Fantasy","Boss Battles","Exploration","RPG"],
+backgroundVideo:"Elden Ring background short .mp4",
+poster:"images/elden-ring.jpg",
+videoGallery:["Elden Ring GMV   Royalty.mp4","ELDEN RING Shadow of the Erdtree  Story Trailer.mp4"],
+demoUrl:"Elden Ring.html",
+officialUrl:"https://en.bandainamcoent.eu/elden-ring/elden-ring"
+},
+
+{
+title:"The Witcher 3: Wild Hunt",
+displayTitle:"The Witcher<br>3",
+year:"2015",
+studio:"CD Projekt Red",
+genre:"Action RPG",
+number:"05 / 06",
+color:"#758796",
+description:"Follow Geralt of Rivia across an atmospheric fantasy continent filled with dangerous creatures, difficult choices, ancient forests, and unforgettable stories.",
+features:["Fantasy","Storytelling","Open World","Exploration"],
+backgroundVideo:"The witcher background short .mp4",
+poster:"images/witcher-3.jpg",
+videoGallery:["The Witcher 3 Wild Hunt - The Sword of Destiny E3 2014 Trailer.mp4","THE WITCHER 3 - ...Steel for Humans Music Video (cinematic).mp4"],
+demoUrl:"The Witcher 3 Wild Hunt.html",
+officialUrl:"https://www.thewitcher.com/us/en/witcher3"
+},
+
+{
+title:"Black Myth: Wukong",
+displayTitle:"Black Myth:<br>Wukong",
+year:"2024",
+studio:"Game Science",
+genre:"Action RPG",
+number:"06 / 06",
+color:"#b8844c",
+description:"Journey into a visually striking fantasy inspired by Chinese mythology. Face formidable enemies, explore mysterious landscapes, and experience a world of powerful legends.",
+features:["Mythology","Action RPG","Boss Battles","Fantasy"],
+backgroundVideo:"Black Myth Wukong background.mp4",
+poster:"images/black-myth-wukong.jpg",
+videoGallery:["Black Myth Wukong long video.mp4","Black Myth Wukong - Pre-Order CG Trailer  PS5 Games.mp4"],
+demoUrl:"Black Myth Wukong.html",
+officialUrl:"https://www.heishenhua.com/"
+}
+];
+
+function safeOutboundUrl(value,allowLocal){
+  try{
+    const url=new URL(value,window.location.href);
+    if(url.protocol!=="https:"&&!(allowLocal&&url.origin===window.location.origin&&["http:","file:"].includes(url.protocol)))return "#";
+    return value;
+  }catch{
+    return "#";
+  }
+}
+
+function addIcon(parent,className){
+  const icon=document.createElement("i");
+  icon.className=className;
+  icon.setAttribute("aria-hidden","true");
+  parent.append(icon);
+}
+
+function renderDisplayTitle(value,target){
+  value.split(/<br\s*\/?>/i).forEach((part,index)=>{
+    if(index)target.append(document.createElement("br"));
+    target.append(document.createTextNode(part));
+  });
+}
+
+const gameSections=document.getElementById("gameSections");
+const gameFragment=document.createDocumentFragment();
+games.forEach((g,i)=>{
+  const section=document.createElement("section");
+  section.className="game-section";
+  section.id=`game-${i+1}`;
+  section.dataset.game=String(i);
+
+  const article=document.createElement("article");
+  article.className="game-content";
+
+  const number=document.createElement("div");
+  number.className="game-number";
+  number.textContent=`${g.number} — GAMING WORLDS`;
+
+  const title=document.createElement("h2");
+  title.className="game-title";
+  renderDisplayTitle(g.displayTitle,title);
+
+  const meta=document.createElement("div");
+  meta.className="game-meta";
+  meta.textContent=`${g.genre} · ${g.studio} · ${g.year}`;
+
+  const description=document.createElement("p");
+  description.className="game-description";
+  description.textContent=g.description;
+
+  const featureList=document.createElement("div");
+  featureList.className="feature-list";
+  g.features.forEach(feature=>{
+    const tag=document.createElement("span");
+    tag.className="feature";
+    tag.textContent=feature;
+    featureList.append(tag);
+  });
+
+  const actions=document.createElement("div");
+  actions.className="game-actions";
+  const play=document.createElement("button");
+  play.className="btn btn-play";
+  play.dataset.play=String(i);
+  addIcon(play,"fa-solid fa-circle-play");
+  play.append(document.createTextNode(" PLAY VIDEO"));
+
+  const demo=document.createElement("a");
+  demo.className="btn btn-demo";
+  demo.dataset.demo=String(i);
+  demo.href=g.demoUrl.startsWith("YOUR_")?"#":safeOutboundUrl(g.demoUrl,true);
+  demo.target="_blank";
+  demo.rel="noopener noreferrer";
+  addIcon(demo,"fa-solid fa-display");
+  demo.append(document.createTextNode(" MY DEMO"));
+
+  const official=document.createElement("a");
+  official.className="btn btn-official";
+  official.href=safeOutboundUrl(g.officialUrl,false);
+  official.target="_blank";
+  official.rel="noopener noreferrer";
+  official.append(document.createTextNode("OFFICIAL SITE "));
+  addIcon(official,"fa-solid fa-arrow-up-right-from-square");
+  actions.append(play,demo,official);
+
+  const notice=document.createElement("div");
+  notice.className="demo-notice";
+  notice.id=`demo-notice-${i}`;
+  notice.hidden=true;
+  article.append(number,title,meta,description,featureList,actions,notice);
+  section.append(article);
+  gameFragment.append(section);
+});
+gameSections.replaceChildren(gameFragment);
+
+/* PRELOADER */
+window.addEventListener("load",()=>setTimeout(()=>document.getElementById("preloader").classList.add("done"),1800));
+setTimeout(()=>document.getElementById("preloader").classList.add("done"),3500);
+
+/* BACKGROUND VIDEO CROSSFADE */
+const va=document.getElementById("videoA");
+const vb=document.getElementById("videoB");
+const ambient=document.getElementById("ambient");
+let active=va,inactive=vb,current=-1,token=0;
+
+function changeBackground(i){
+  if(i<0||i>=games.length||i===current)return;
+  current=i;
+  const g=games[i],t=++token;
+  ambient.style.setProperty("--ambient",g.color);
+  inactive.pause();
+  inactive.removeAttribute("src");
+  if(g.poster)inactive.poster=g.poster;
+  else inactive.removeAttribute("poster");
+  inactive.load();
+  let done=false;
+
+  const reveal=()=>{
+    if(done||t!==token)return;
+    done=true;
+    inactive.classList.add("active");
+    active.classList.remove("active");
+    inactive.play().catch(()=>{});
+    [active,inactive]=[inactive,active];
+  };
+
+  inactive.addEventListener("canplay",reveal,{once:true});
+  inactive.addEventListener("error",reveal,{once:true});
+  inactive.src=g.backgroundVideo;
+  inactive.load();
+  setTimeout(reveal,900);
+}
+
+const sections=[...document.querySelectorAll(".game-section")];
+const dots=[...document.querySelectorAll(".game-indicator a")];
+
+const observer=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  let i=+e.target.dataset.game;
+  e.target.classList.add("visible");
+  changeBackground(i);
+  dots.forEach((d,j)=>d.classList.toggle("active",i===j));
+}),{threshold:.08});
+
+sections.forEach(s=>observer.observe(s));
+sections[0]?.classList.add("visible");
+changeBackground(0);
+
+/* MODAL UTILITIES */
+const modals=[...document.querySelectorAll(".modal")];
+let lastFocus=null;
+
+function openModal(m){
+  lastFocus=document.activeElement;
+  modals.forEach(x=>x.classList.remove("open"));
+  m.classList.add("open");
+  document.body.classList.add("modal-open");
+  m.querySelector("input,textarea,button")?.focus();
+}
+
+function closeModal(m){
+  m.classList.remove("open");
+  if(!modals.some(x=>x.classList.contains("open")))document.body.classList.remove("modal-open");
+  lastFocus?.focus?.();
+}
+
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeModal(b.closest(".modal")));
+
+modals.forEach(m=>m.addEventListener("click",e=>{
+  if(e.target===m){
+    if(m.id==="videoModal")closeVideo();
+    else closeModal(m);
+  }
+}));
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    modals.forEach(m=>m.classList.remove("open"));
+    document.body.classList.remove("modal-open");
+    document.getElementById("modalVideo").pause();
+  }
+});
+
+/* SIGN IN / SIGN UP */
+const authModal=document.getElementById("authModal");
+const authForm=document.getElementById("authForm");
+const authStatus=document.getElementById("authStatus");
+let authMode="login";
+
+function setAuth(mode){
+  authMode=mode;
+  let signup=mode==="signup";
+
+  document.getElementById("authTitle").textContent=signup?"Create Account":"Welcome Back";
+  document.getElementById("authSubtitle").textContent=signup?"Create your NOVA333x account.":"Sign in to your NOVA333x account.";
+  document.getElementById("authSubmit").textContent=signup?"CREATE ACCOUNT":"SIGN IN";
+  document.getElementById("nameField").hidden=!signup;
+  document.getElementById("authName").required=signup;
+  document.getElementById("termsRow").hidden=!signup;
+  document.getElementById("authTerms").required=signup;
+  document.getElementById("authPassword").autocomplete=signup?"new-password":"current-password";
+
+  const authSwitch=document.getElementById("authSwitch");
+  const switchButton=document.createElement("button");
+  switchButton.className="text-button";
+  switchButton.type="button";
+  switchButton.dataset.switch=signup?"login":"signup";
+  switchButton.textContent=signup?"Sign in":"Sign up";
+  authSwitch.replaceChildren(
+    document.createTextNode(signup?"Already have an account? ":"Don't have an account? "),
+    switchButton
+  );
+
+  authStatus.classList.remove("show");
+}
+
+document.querySelectorAll("[data-open-auth]").forEach(b=>b.onclick=()=>{
+  setAuth(b.dataset.openAuth);
+  openModal(authModal);
+});
+
+document.getElementById("authSwitch").onclick=e=>{
+  if(e.target.dataset.switch)setAuth(e.target.dataset.switch);
+};
+
+document.getElementById("togglePassword").onclick=()=>{
+  let p=document.getElementById("authPassword");
+  p.type=p.type==="password"?"text":"password";
+};
+
+authForm.onsubmit=e=>{
+  e.preventDefault();
+  authForm.querySelectorAll('input:not([type="password"])').forEach(input=>{
+    input.value=input.value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g,"").trim();
+  });
+  if(!authForm.reportValidity())return;
+
+  authStatus.textContent=authMode==="signup"
+    ?"Form validation completed. Connect a backend to enable registration. No account has been created."
+    :"Form validation completed. Connect an authentication provider to enable sign-in.";
+
+  authStatus.classList.add("show");
+};
+
+/* CONTACT FORM */
+const contactModal=document.getElementById("contactModal");
+const contactForm=document.getElementById("contactForm");
+const contactStatus=document.getElementById("contactStatus");
+
+document.querySelectorAll("[data-open-contact]").forEach(b=>b.onclick=()=>openModal(contactModal));
+
+contactForm.onsubmit=e=>{
+  e.preventDefault();
+  contactForm.querySelectorAll("input,textarea").forEach(field=>{
+    field.value=field.value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g,"").trim();
+  });
+  if(!contactForm.reportValidity())return;
+  const email=contactForm.elements.email.value;
+  const subjectValue=contactForm.elements.subject.value;
+  if(/[\r\n]/.test(email)||/[\r\n]/.test(subjectValue)){
+    contactStatus.textContent="Please remove line breaks from the email address and subject.";
+    contactStatus.classList.add("show");
+    return;
+  }
+
+  if(CONTACT_EMAIL==="user@example.com"){
+    contactStatus.textContent="Please replace user@example.com in the script with your email address.";
+    contactStatus.classList.add("show");
+    return;
+  }
+
+  const d=new FormData(contactForm);
+  const subject=encodeURIComponent(d.get("subject"));
+  const body=encodeURIComponent(`Name: ${d.get("name")}\nEmail: ${d.get("email")}\n\n${d.get("message")}`);
+
+  contactStatus.textContent="Opening your email app. Complete sending the message there.";
+  contactStatus.classList.add("show");
+  location.href=`mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+};
+
+/* VIDEO GALLERY */
+const videoModal=document.getElementById("videoModal");
+const mv=document.getElementById("modalVideo");
+const message=document.getElementById("videoMessage");
+let gi=0,vi=0;
+
+function showVideo(){
+  let g=games[gi],list=g.videoGallery;
+  mv.pause();
+  mv.removeAttribute("src");
+  mv.load();
+  message.classList.remove("show");
+
+  document.getElementById("modalTitle").textContent=g.title;
+  document.getElementById("modalSubtitle").textContent="NOVA333x Showcase · "+g.genre;
+  document.getElementById("videoCount").textContent=`VIDEO ${String(vi+1).padStart(2,"0")} / ${String(list.length).padStart(2,"0")}`;
+  document.getElementById("prevVideo").disabled=vi===0;
+  document.getElementById("nextVideo").disabled=vi===list.length-1;
+
+  mv.src=list[vi];
+  mv.load();
+  mv.play().catch(()=>{});
+}
+
+document.querySelectorAll("[data-play]").forEach(b=>b.onclick=()=>{
+  gi=+b.dataset.play;
+  vi=0;
+  openModal(videoModal);
+  showVideo();
+});
+
+document.getElementById("prevVideo").onclick=()=>{
+  if(vi>0){vi--;showVideo();}
+};
+
+document.getElementById("nextVideo").onclick=()=>{
+  if(vi<games[gi].videoGallery.length-1){vi++;showVideo();}
+};
+
+function closeVideo(){
+  mv.pause();
+  mv.removeAttribute("src");
+  mv.load();
+  message.classList.remove("show");
+  closeModal(videoModal);
+}
+
+document.getElementById("modalClose").onclick=closeVideo;
+mv.onerror=()=>message.classList.add("show");
+mv.onloadeddata=()=>message.classList.remove("show");
+
+/* MY DEMO: OPEN THE LINK OR SHOW AN INLINE ENGLISH MESSAGE */
+document.querySelectorAll("[data-demo]").forEach(a=>a.addEventListener("click",e=>{
+  let i=+a.dataset.demo;
+  let url=(games[i].demoUrl||"").trim();
+
+  if(url&&!url.startsWith("YOUR_")&&url!=="#"){
+    e.preventDefault();
+    window.open(url,"_blank","noopener,noreferrer");
+    return;
+  }
+
+  e.preventDefault();
+  let box=document.getElementById("demo-notice-"+i);
+  box.hidden=false;
+  box.textContent="Demo link not added yet. Replace this game's demoUrl in the games list with your live demo website URL.";
+  box.style.cssText="display:block;margin-top:14px;padding:12px;border:1px solid #c7a66a66;border-radius:7px;color:#f1d8a8;font-size:11px;line-height:1.8";
+  box.scrollIntoView({behavior:"smooth",block:"center"});
+}));
+
+/* MOBILE NAVIGATION */
+const menu=document.getElementById("menuToggle");
+const nav=document.getElementById("navLinks");
+
+menu.onclick=()=>{
+  let open=nav.classList.toggle("open");
+  menu.setAttribute("aria-expanded",String(open));
+  menu.querySelector("i").className=open?"fa-solid fa-xmark":"fa-solid fa-bars";
+};
+
+document.querySelectorAll(".dropdown-toggle").forEach(b=>b.onclick=()=>{
+  let d=b.closest(".dropdown");
+  d.classList.toggle("open");
+  b.setAttribute("aria-expanded",String(d.classList.contains("open")));
+});
+
+nav.querySelectorAll("a").forEach(a=>a.onclick=()=>{
+  nav.classList.remove("open");
+  nav.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("open"));
+  menu.setAttribute("aria-expanded","false");
+  menu.querySelector("i").className="fa-solid fa-bars";
+});
+</script>
+</body>
+</html>
